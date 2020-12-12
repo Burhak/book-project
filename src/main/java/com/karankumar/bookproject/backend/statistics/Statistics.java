@@ -24,10 +24,13 @@ import com.karankumar.bookproject.backend.service.PredefinedShelfService;
 import java.util.Set;
 
 public class Statistics {
-    protected final Set<Book> readShelfBooks;
+    private final Set<Book> readShelfBooks;
 
     public Statistics(PredefinedShelfService predefinedShelfService) {
-        PredefinedShelf readShelf = predefinedShelfService.findReadShelf();
-        readShelfBooks = readShelf.getBooks();
+        this.readShelfBooks = predefinedShelfService.findReadShelf().getBooks();
+    }
+
+    public Set<Book> getReadShelfBooks() {
+        return readShelfBooks;
     }
 }

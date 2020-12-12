@@ -35,7 +35,7 @@ class RatingStatisticsTest {
     private final BookService bookService;
     private final PredefinedShelfService predefinedShelfService;
 
-    private static RatingStatistics ratingStatistics;
+    private RatingStatistics ratingStatistics;
 
     private Book bookWithNoRating;
     private Book bookWithHighestRating;
@@ -53,7 +53,7 @@ class RatingStatisticsTest {
         bookWithNoRating = StatisticTestUtils.getBookWithLowestRating();
         bookWithHighestRating = StatisticTestUtils.getBookWithHighestRating();
 
-        ratingStatistics = new RatingStatistics(predefinedShelfService);
+        ratingStatistics = new RatingStatistics(new Statistics(predefinedShelfService));
     }
 
     @Test
@@ -104,6 +104,6 @@ class RatingStatisticsTest {
 
     private void resetRatingStatistics() {
         bookService.deleteAll();
-        ratingStatistics = new RatingStatistics(predefinedShelfService);
+        ratingStatistics = new RatingStatistics(new Statistics(predefinedShelfService));
     }
 }

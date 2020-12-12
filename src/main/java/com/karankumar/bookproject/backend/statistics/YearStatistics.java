@@ -19,35 +19,30 @@ package com.karankumar.bookproject.backend.statistics;
 
 import com.karankumar.bookproject.backend.entity.Book;
 import com.karankumar.bookproject.backend.entity.RatingScale;
-import com.karankumar.bookproject.backend.service.PredefinedShelfService;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
-public class YearStatistics extends Statistics {
-    private List<Book> readBooksThisYear = new ArrayList<>();
+public class YearStatistics {
+    private final List<Book> readBooksThisYear;
+    private final Statistics statistics;
 
-    public YearStatistics(PredefinedShelfService predefinedShelfService) {
-        super(predefinedShelfService);
-        readBooksThisYear = findReadBooksAddedThisYear();
+    public YearStatistics(Statistics statistics) {
+        this.statistics = statistics;
+        this.readBooksThisYear = findReadBooksAddedThisYear();
     }
 
     private List<Book> findReadBooksAddedThisYear() {
-        for (Book book : readShelfBooks) {
-            if (book.getDateStartedReading() != null) {
-                LocalDate dt = book.getDateStartedReading();
-                LocalDate today = LocalDate.now();
-                if ((book.getRating() != null) && (dt.getYear() == today.getYear())) {
-                    readBooksThisYear.add(book);
-                }
-
-            }
-        }
-        return readBooksThisYear;
+        return statistics.getReadShelfBooks()
+                .stream()
+                .filter(book -> book.getDateStartedReading() != null)
+                .filter(book -> book.getRating() != null)
+                .filter(book -> book.getDateStartedReading().getYear() == LocalDate.now().getYear())
+                .collect(Collectors.toList());
     }
 
     public Optional<Book> findLeastLikedBookThisYear() {

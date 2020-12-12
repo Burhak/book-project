@@ -21,10 +21,7 @@ import com.helger.commons.annotation.VisibleForTesting;
 import com.karankumar.bookproject.backend.entity.Book;
 import com.karankumar.bookproject.backend.entity.BookGenre;
 import com.karankumar.bookproject.backend.service.PredefinedShelfService;
-import com.karankumar.bookproject.backend.statistics.GenreStatistics;
-import com.karankumar.bookproject.backend.statistics.PageStatistics;
-import com.karankumar.bookproject.backend.statistics.RatingStatistics;
-import com.karankumar.bookproject.backend.statistics.YearStatistics;
+import com.karankumar.bookproject.backend.statistics.*;
 import com.karankumar.bookproject.ui.MainView;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.html.Div;
@@ -45,13 +42,19 @@ import java.util.Optional;
 public class StatisticsView extends VerticalLayout {
 
     public StatisticsView(PredefinedShelfService predefinedShelfService) {
+        long start = System.currentTimeMillis();
+        Statistics statistics = new Statistics(predefinedShelfService);
         for (StatisticType statistic : StatisticType.values()) {
             String caption = statistic.getCaption();
-            Optional<String> value = statistic.calculateStatistic(predefinedShelfService);
+            Optional<String> value = statistic.calculateStatistic(statistics);
             value.ifPresent(val -> add(configureStatistic(caption, val)));
         }
         setSizeFull();
         setAlignItems(Alignment.CENTER);
+
+        long end = System.currentTimeMillis();
+        long duration = end - start;
+        System.err.println("EXECUTION DURATION " + duration + " ms");
     }
 
     private Div configureStatistic(String caption, String statistic) {
@@ -75,8 +78,8 @@ public class StatisticsView extends VerticalLayout {
     public enum StatisticType {
         AVERAGE_RATING("Average rating given:") {
             @Override
-            public Optional<String> calculateStatistic(PredefinedShelfService predefinedShelfService) {
-                RatingStatistics ratingStatistics = new RatingStatistics(predefinedShelfService);
+            public Optional<String> calculateStatistic(Statistics statistics) {
+                RatingStatistics ratingStatistics = new RatingStatistics(statistics);
                 Optional<Double> averageRating =
                         Optional.ofNullable(ratingStatistics.calculateAverageRatingGiven());
                 return  averageRating.map(rating ->
@@ -85,8 +88,8 @@ public class StatisticsView extends VerticalLayout {
         },
         MOST_LIKED_BOOK("Most liked book:") {
             @Override
-            public Optional<String> calculateStatistic(PredefinedShelfService predefinedShelfService) {
-                RatingStatistics ratingStatistics = new RatingStatistics(predefinedShelfService);
+            public Optional<String> calculateStatistic(Statistics statistics) {
+                RatingStatistics ratingStatistics = new RatingStatistics(statistics);
                 Optional<Book> mostLikedBook = Optional.ofNullable(ratingStatistics.findMostLikedBook());
                 return mostLikedBook.map(book ->
                         formatStatistic(book.getTitle(), book.getRating().toString(), "rating"));
@@ -94,8 +97,8 @@ public class StatisticsView extends VerticalLayout {
         },
         LEAST_LIKED_BOOK("Least liked book:") {
             @Override
-            public Optional<String> calculateStatistic(PredefinedShelfService predefinedShelfService) {
-                RatingStatistics ratingStatistics = new RatingStatistics(predefinedShelfService);
+            public Optional<String> calculateStatistic(Statistics statistics) {
+                RatingStatistics ratingStatistics = new RatingStatistics(statistics);
                 Optional<Book> leastLikedBook =
                         Optional.ofNullable(ratingStatistics.findLeastLikedBook());
                 return leastLikedBook.map(book ->
@@ -104,8 +107,8 @@ public class StatisticsView extends VerticalLayout {
         },
         LEAST_LIKED_BOOK_THIS_YEAR("Least liked book this year:") {
             @Override
-            public Optional<String> calculateStatistic(PredefinedShelfService predefinedShelfService) {
-                YearStatistics yearStatistics = new YearStatistics(predefinedShelfService);
+            public Optional<String> calculateStatistic(Statistics statistics) {
+                YearStatistics yearStatistics = new YearStatistics(statistics);
                 Optional<Book> leastLikedBook =
                         yearStatistics.findLeastLikedBookThisYear();
                 return leastLikedBook.map(book ->
@@ -114,8 +117,8 @@ public class StatisticsView extends VerticalLayout {
         },
         MOST_LIKED_BOOK_THIS_YEAR("Most liked book this year:") {
             @Override
-            public Optional<String> calculateStatistic(PredefinedShelfService predefinedShelfService) {
-                YearStatistics yearStatistics = new YearStatistics(predefinedShelfService);
+            public Optional<String> calculateStatistic(Statistics statistics) {
+                YearStatistics yearStatistics = new YearStatistics(statistics);
                 Optional<Book> mostLikedBook =
                         yearStatistics.findMostLikedBookThisYear();
                 return mostLikedBook.map(book ->
@@ -124,8 +127,8 @@ public class StatisticsView extends VerticalLayout {
         },
         AVERAGE_RATING_THIS_YEAR("Average rating given this year:") {
             @Override
-            public Optional<String> calculateStatistic(PredefinedShelfService predefinedShelfService) {
-                YearStatistics yearStatistics = new YearStatistics(predefinedShelfService);
+            public Optional<String> calculateStatistic(Statistics statistics) {
+                YearStatistics yearStatistics = new YearStatistics(statistics);
                 Optional<Double> averageRatingGivenThisYear =
                         yearStatistics.calculateAverageRatingGivenThisYear();
                 return averageRatingGivenThisYear.map(rating ->
@@ -134,8 +137,8 @@ public class StatisticsView extends VerticalLayout {
         },
         MOST_READ_GENRE("Most read genre:") {
             @Override
-            public Optional<String> calculateStatistic(PredefinedShelfService predefinedShelfService) {
-                GenreStatistics genreStatistics = new GenreStatistics(predefinedShelfService);
+            public Optional<String> calculateStatistic(Statistics statistics) {
+                GenreStatistics genreStatistics = new GenreStatistics(statistics);
                 Optional<BookGenre> mostReadGenre =
                         Optional.ofNullable(genreStatistics.findMostReadGenre());
                 return mostReadGenre.map(BookGenre::toString);
@@ -143,8 +146,8 @@ public class StatisticsView extends VerticalLayout {
         },
         MOST_LIKED_GENRE("Most liked genre read:") {
             @Override
-            public Optional<String> calculateStatistic(PredefinedShelfService predefinedShelfService) {
-                GenreStatistics genreStatistics = new GenreStatistics(predefinedShelfService);
+            public Optional<String> calculateStatistic(Statistics statistics) {
+                GenreStatistics genreStatistics = new GenreStatistics(statistics);
                 Optional<BookGenre> mostLikedGenre =
                         Optional.ofNullable(genreStatistics.findMostLikedGenre());
                 return mostLikedGenre.map(BookGenre::toString);
@@ -152,8 +155,8 @@ public class StatisticsView extends VerticalLayout {
         },
         LEAST_LIKED_GENRE("Least liked genre read:") {
             @Override
-            public Optional<String> calculateStatistic(PredefinedShelfService predefinedShelfService) {
-                GenreStatistics genreStatistics = new GenreStatistics(predefinedShelfService);
+            public Optional<String> calculateStatistic(Statistics statistics) {
+                GenreStatistics genreStatistics = new GenreStatistics(statistics);
                 Optional<BookGenre> leastLikedGenre =
                         Optional.ofNullable(genreStatistics.findLeastLikedGenre());
                 return leastLikedGenre.map(BookGenre::toString);
@@ -161,8 +164,8 @@ public class StatisticsView extends VerticalLayout {
         },
         AVERAGE_PAGE_LENGTH("Average page length:") {
             @Override
-            public Optional<String> calculateStatistic(PredefinedShelfService predefinedShelfService) {
-                PageStatistics pageStatistics = new PageStatistics(predefinedShelfService);
+            public Optional<String> calculateStatistic(Statistics statistics) {
+                PageStatistics pageStatistics = new PageStatistics(statistics);
                 Optional<Double> averagePageLength =
                         Optional.ofNullable(pageStatistics.calculateAveragePageLength());
                 return averagePageLength.map(pageLength -> String.format("%f pages", pageLength));
@@ -170,8 +173,8 @@ public class StatisticsView extends VerticalLayout {
         },
         LONGEST_BOOK("Longest book read:") {
             @Override
-            public Optional<String> calculateStatistic(PredefinedShelfService predefinedShelfService) {
-                PageStatistics pageStatistics = new PageStatistics(predefinedShelfService);
+            public Optional<String> calculateStatistic(Statistics statistics) {
+                PageStatistics pageStatistics = new PageStatistics(statistics);
                 Optional<Book> longestBook =
                         Optional.ofNullable(pageStatistics.findBookWithMostPages());
                 return longestBook.map(book ->
@@ -187,6 +190,6 @@ public class StatisticsView extends VerticalLayout {
             this.caption = caption;
         }
 
-        public abstract Optional<String> calculateStatistic(PredefinedShelfService predefinedShelfService);
+        public abstract Optional<String> calculateStatistic(Statistics statistics);
     }
 }

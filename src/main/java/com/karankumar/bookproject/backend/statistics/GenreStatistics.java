@@ -20,7 +20,6 @@ package com.karankumar.bookproject.backend.statistics;
 import com.karankumar.bookproject.backend.entity.Book;
 import com.karankumar.bookproject.backend.entity.BookGenre;
 import com.karankumar.bookproject.backend.entity.RatingScale;
-import com.karankumar.bookproject.backend.service.PredefinedShelfService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,13 +28,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class GenreStatistics extends Statistics {
-    protected static final int MINIMUM_NUMBER_OF_GENRES = 1;
-    private final List<Book> readBooksWithGenresAndRatings;
+public class GenreStatistics {
+    private static final int MINIMUM_NUMBER_OF_GENRES = 1;
 
-    public GenreStatistics(PredefinedShelfService predefinedShelfService) {
-        super(predefinedShelfService);
-        readBooksWithGenresAndRatings = findReadBooksWithGenresAndRatings();
+    private final List<Book> readBooksWithGenresAndRatings;
+    private final Statistics statistics;
+
+    public GenreStatistics(Statistics statistics) {
+        this.statistics = statistics;
+        this.readBooksWithGenresAndRatings = findReadBooksWithGenresAndRatings();
     }
 
     /**
@@ -77,7 +78,7 @@ public class GenreStatistics extends Statistics {
     }
 
     private List<BookGenre> genresRead() {
-        return readShelfBooks.stream()
+        return statistics.getReadShelfBooks().stream()
                              .takeWhile(book -> book.getBookGenre() != null)
                              .map(Book::getBookGenre)
                              .collect(Collectors.toList());
@@ -146,7 +147,7 @@ public class GenreStatistics extends Statistics {
 
     private List<Book> findReadBooksWithGenresAndRatings() {
         List<Book> booksWithGenresAndRatings = new ArrayList<>();
-        for (Book book : readShelfBooks) {
+        for (Book book : statistics.getReadShelfBooks()) {
             if (bookHasGenreAndRating(book)) {
                 booksWithGenresAndRatings.add(book);
             }

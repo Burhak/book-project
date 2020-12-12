@@ -19,20 +19,20 @@ package com.karankumar.bookproject.backend.statistics;
 
 import com.karankumar.bookproject.backend.entity.Book;
 import com.karankumar.bookproject.backend.entity.RatingScale;
-import com.karankumar.bookproject.backend.service.PredefinedShelfService;
 import lombok.extern.java.Log;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Log
-public class RatingStatistics extends Statistics {
-    private List<Book> readBooksRated = new ArrayList<>();
+public class RatingStatistics {
+    private final List<Book> readBooksRated;
+    private final Statistics statistics;
 
-    public RatingStatistics(PredefinedShelfService predefinedShelfService) {
-        super(predefinedShelfService);
-        readBooksRated = findReadBooksWithRatings();
+    public RatingStatistics(Statistics statistics) {
+        this.statistics = statistics;
+        this.readBooksRated = findReadBooksWithRatings();
     }
 
     /**
@@ -48,12 +48,10 @@ public class RatingStatistics extends Statistics {
     }
 
     private List<Book> findReadBooksWithRatings() {
-        for (Book book : readShelfBooks) {
-            if (book.getRating() != null) {
-                readBooksRated.add(book);
-            }
-        }
-        return readBooksRated;
+        return statistics.getReadShelfBooks()
+                .stream()
+                .filter(book -> book.getRating() != null)
+                .collect(Collectors.toList());
     }
 
     /**

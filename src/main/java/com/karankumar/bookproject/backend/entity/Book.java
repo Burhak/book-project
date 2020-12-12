@@ -67,27 +67,28 @@ public class Book extends BaseEntity {
     private String isbn;
     private Integer yearOfPublication;
 
-    @ManyToOne(cascade =
-            {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}
+    @ManyToOne(
+            fetch = FetchType.LAZY,
+            cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}
     )
     @JoinColumn(name = "author_id", referencedColumnName = "ID")
     private Author author;
 
     @ManyToOne(
-            fetch = FetchType.EAGER,
+            fetch = FetchType.LAZY,
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}
     )
     @JoinColumn(name = "predefined_shelf_id", referencedColumnName = "ID")
     private PredefinedShelf predefinedShelf;
 
     @ManyToOne(
-            fetch = FetchType.EAGER,
+            fetch = FetchType.LAZY,
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}
     )
     @JoinColumn(name = "custom_shelf_id", referencedColumnName = "ID")
     private CustomShelf customShelf;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
             name = "book_tag",
             joinColumns = @JoinColumn(name = "book_id", referencedColumnName = "id"),
@@ -95,7 +96,7 @@ public class Book extends BaseEntity {
     )
     private Set<Tag> tags;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.REFRESH})
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
             name = "book_publisher",
             joinColumns = @JoinColumn(name = "book_id", referencedColumnName = "id"),

@@ -35,7 +35,7 @@ class GenreStatisticsTest {
     private final BookService bookService;
     private final PredefinedShelfService predefinedShelfService;
 
-    private static GenreStatistics genreStatistics;
+    private GenreStatistics genreStatistics;
 
     @Autowired
     GenreStatisticsTest(BookService bookService, PredefinedShelfService predefinedShelfService) {
@@ -47,7 +47,7 @@ class GenreStatisticsTest {
     public void setUp() {
         resetBookService();
         StatisticTestUtils.populateReadBooks(bookService, predefinedShelfService);
-        genreStatistics = new GenreStatistics(predefinedShelfService);
+        genreStatistics = new GenreStatistics(new Statistics(predefinedShelfService));
     }
 
     private void resetBookService() {
@@ -96,7 +96,7 @@ class GenreStatisticsTest {
         // given
         resetBookService();
         saveBook();
-        genreStatistics = new GenreStatistics(predefinedShelfService);
+        genreStatistics = new GenreStatistics(new Statistics(predefinedShelfService));
 
         // when
         BookGenre mostLiked = genreStatistics.findMostLikedGenre();
@@ -115,7 +115,7 @@ class GenreStatisticsTest {
         // given
         resetBookService();
         saveBook();
-        genreStatistics = new GenreStatistics(predefinedShelfService);
+        genreStatistics = new GenreStatistics(new Statistics(predefinedShelfService));
 
         // when
         BookGenre leastLiked = genreStatistics.findLeastLikedGenre();

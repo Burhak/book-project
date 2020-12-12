@@ -38,7 +38,7 @@ class PageStatisticsTest {
     private final BookService bookService;
     private final PredefinedShelfService predefinedShelfService;
 
-    private static PageStatistics pageStatistics;
+    private PageStatistics pageStatistics;
 
     @Autowired
     PageStatisticsTest(BookService bookService, PredefinedShelfService predefinedShelfService) {
@@ -50,7 +50,7 @@ class PageStatisticsTest {
     public void setUp() {
         bookService.deleteAll();
         StatisticTestUtils.populateReadBooks(bookService, predefinedShelfService);
-        PageStatisticsTest.pageStatistics = new PageStatistics(predefinedShelfService);
+        pageStatistics = new PageStatistics(new Statistics(predefinedShelfService));
     }
 
     @Test
@@ -99,7 +99,7 @@ class PageStatisticsTest {
     void calculateAveragePageLengthWithFloatPointCalculationCorrectly() {
         // given
         StatisticTestUtils.deleteBook(StatisticTestUtils.getBookWithHighestRating());
-        pageStatistics = new PageStatistics(predefinedShelfService);
+        pageStatistics = new PageStatistics(new Statistics(predefinedShelfService));
 
         // when
         Double actual = pageStatistics.calculateAveragePageLength();
@@ -111,6 +111,6 @@ class PageStatisticsTest {
 
     private void resetPageStatistics() {
         bookService.deleteAll();
-        pageStatistics = new PageStatistics(predefinedShelfService);
+        pageStatistics = new PageStatistics(new Statistics(predefinedShelfService));
     }
 }

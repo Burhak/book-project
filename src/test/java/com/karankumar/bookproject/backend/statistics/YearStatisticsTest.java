@@ -52,7 +52,7 @@ class YearStatisticsTest {
         bookWithLowestRatingThisYear = StatisticTestUtils.getBookWithLowestRatingThisYear();
         bookWithHighestRatingThisYear = StatisticTestUtils.getBookWithHighestRatingThisYear();
 
-        yearStatistic = new YearStatistics(predefinedShelfService);
+        yearStatistic = new YearStatistics(new Statistics(predefinedShelfService));
     }
 
     @Test
@@ -109,6 +109,6 @@ class YearStatisticsTest {
 
     private void resetRatingStatistics() {
         bookService.deleteAll();
-        this.yearStatistic = new YearStatistics(predefinedShelfService);
+        yearStatistic = new YearStatistics(new Statistics(predefinedShelfService));
     }
 }

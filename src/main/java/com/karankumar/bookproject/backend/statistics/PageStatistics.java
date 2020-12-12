@@ -18,17 +18,17 @@
 package com.karankumar.bookproject.backend.statistics;
 
 import com.karankumar.bookproject.backend.entity.Book;
-import com.karankumar.bookproject.backend.service.PredefinedShelfService;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class PageStatistics extends Statistics {
+public class PageStatistics {
     private final List<Book> booksWithPageCount;
+    private final Statistics statistics;
 
-    public PageStatistics(PredefinedShelfService predefinedShelfService) {
-        super(predefinedShelfService);
+    public PageStatistics(Statistics statistics) {
+        this.statistics = statistics;
         booksWithPageCount = findBooksWithPageCountSpecified();
     }
 
@@ -46,7 +46,7 @@ public class PageStatistics extends Statistics {
 
     private List<Book> findBooksWithPageCountSpecified() {
         List<Book> booksWithNonEmptyPageCount = new ArrayList<>();
-        for (Book book : readShelfBooks) {
+        for (Book book : statistics.getReadShelfBooks()) {
             if (book.getNumberOfPages() != null) {
                 booksWithNonEmptyPageCount.add(book);
             }
@@ -63,10 +63,7 @@ public class PageStatistics extends Statistics {
                                                    .mapToInt(Book::getNumberOfPages)
                                                    .sum();
         int booksWithPagesSpecified = booksWithPageCount.size();
-        if (booksWithPagesSpecified == 0) {
-            return null;
-        }
-        return (booksWithPagesSpecified == 0) ? 0 :
-                Math.ceil(totalNumberOfPages / (float) booksWithPagesSpecified);
+        if (booksWithPagesSpecified == 0) return null;
+        return Math.ceil(totalNumberOfPages / (float) booksWithPagesSpecified);
     }
 }
